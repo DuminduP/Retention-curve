@@ -1,11 +1,11 @@
 <?php
+use exception\NoDataException;
 use PHPUnit\Framework\TestCase;
 use \src\ReadCsv;
-use exception\FileNotFoundException;
 
 class ReadCsvTest extends TestCase
 {
-    public function testCanBeCreatedFromValidCsvFile(): void
+    public function testCreatedWithValidCsvFile(): void
     {
         $this->assertInstanceOf(
             ReadCsv::class,
@@ -13,18 +13,22 @@ class ReadCsvTest extends TestCase
         );
     }
 
+    public function testCreatedWithInvalidCsvFile(): void
+    {
+        $this->expectException(NoDataException::class);
+        $tmp = new ReadCsv('tests/testempty.csv');
+        $tmp->getData();
+    }
+
     public function testValidDataSet(): void
     {
-        $readCsv = new ReadCsv('export.csv');
+        $readCsv = new ReadCsv('tests/testdata.csv');
         $data = $readCsv->getData();
         $this->assertIsArray($data);
-        $this->assertCount(339, $data);
-        $this->assertArrayHasKey('user_id', $data[0]);
-        $this->assertArrayHasKey('created_at', $data[0]);
-        $this->assertArrayHasKey('onboarding_perentage', $data[0]);
-        $this->assertEquals(3121,$data[0]['user_id']);
-        $this->assertEquals('2016-07-19',$data[0]['created_at']);
-        $this->assertEquals(40,$data[0]['onboarding_perentage']);
+        $this->assertCount(3, $data);
+        $this->assertEquals(3525, $data[0]['0']);
+        $this->assertEquals('2016-08-10', $data[0][1]);
+        $this->assertEquals(99, $data[0]['2']);
     }
 
 }

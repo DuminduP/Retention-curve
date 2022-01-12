@@ -2,12 +2,11 @@
 
 namespace src;
 
-use Exception;
 use exception\FileNotFoundException;
+use exception\NoDataException;
 
 class ReadCsv
 {
-
     private $fileHandle;
 
     public function __construct(string $fileName)
@@ -19,22 +18,13 @@ class ReadCsv
 
     public function getData(): array
     {
-        $row = 1;
         $dataSet = [];
+        $headers = fgetcsv($this->fileHandle, 1000, ";"); //Read headers
+        if ($headers === false) {
+            throw new NoDataException("Empty file or unsupported format");
+        }
         while (($data = fgetcsv($this->fileHandle, 1000, ";")) !== false) {
-            if ($row == 1) {
-                $keys = $data;
-                $row++;
-                continue;
-            }
-            $dataSet[] = [
-                $keys[0] => $data[0],
-                $keys[1] => $data[1],
-                $keys[2] => $data[2],
-                $keys[3] => $data[3],
-                $keys[4] => $data[4],
-            ];
-            $row++;
+            $dataSet[] = $data;
         }
         fclose($this->fileHandle);
         return $dataSet;
